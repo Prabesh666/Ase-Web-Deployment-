@@ -1,0 +1,24 @@
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy the entire repo and move into the WebApp folder
+COPY . .
+WORKDIR "/src/MyWebApp"
+
+# Restore and Publish
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app
+
+# Run Stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+
+# Install libgdiplus for graphical output (required by BOOSE)
+RUN apt-get update && apt-get install -y libgdiplus libc6-dev && rm -rf /var/lib/apt/lists/*
+
+# Copy built files from the build stage
+COPY --from=build /app .
+
+# Entry point - the DLL will be named after your project file
+ENTRYPOINT ["dotnet", "MyWebApp.dll"]
