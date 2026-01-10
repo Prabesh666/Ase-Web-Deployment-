@@ -1,0 +1,78 @@
+@model MyWebApp.Models.RunViewModel
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BOOSE Web Runner</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        textarea, input[type=text] { width: 100%; box-sizing: border-box; padding: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+        textarea { min-height: 320px; resize: vertical; }
+        .row { margin-bottom: 12px; }
+        .btn { padding: 10px 14px; border: 0; border-radius: 8px; cursor: pointer; }
+        .btn-primary { background: #0d6efd; color: #fff; }
+        .msg { padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; }
+        .ok { background: #e7f5ff; border: 1px solid #a5d8ff; }
+        .err { background: #fff5f5; border: 1px solid #ffa8a8; }
+        .canvas { border: 1px solid #ddd; border-radius: 10px; padding: 10px; }
+        img { max-width: 100%; height: auto; display: block; }
+        small { color: #666; }
+    </style>
+</head>
+<body>
+    <h1>BOOSE Web Runner</h1>
+    <p><small>Tip: If “Single Command” is filled, it runs that line; otherwise it runs the whole “Program Window”.</small></p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+    {
+        <div class="msg @(Model.IsError ? "err" : "ok")">
+            @Model.StatusMessage
+        </div>
+    }
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="grid">
+            <div>
+                <div class="row">
+                    <label for="ProgramText"><strong>Program Window</strong></label>
+                    <textarea id="ProgramText" name="ProgramText">@Model.ProgramText</textarea>
+                </div>
+
+                <div class="row">
+                    <label for="SingleCommand"><strong>Single Command</strong></label>
+                    <input id="SingleCommand" name="SingleCommand" type="text" value="@Model.SingleCommand" />
+                </div>
+
+                <button class="btn btn-primary" type="submit">Run</button>
+            </div>
+
+            <div class="canvas">
+                <strong>Output</strong>
+                <div style="margin-top:10px;">
+                    @if (!string.IsNullOrWhiteSpace(Model.OutputImageBase64))
+                    {
+                        <img alt="Canvas Output" src="data:image/png;base64,@Model.OutputImageBase64" />
+                    }
+                    else
+                    {
+                        <div style="padding: 18px; color:#666;">
+                            No output image yet. Run a command/program to render the canvas.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <hr style="margin: 24px 0;" />
+    <p><small>Note: This web version uses <code>System.Drawing</code>. For best compatibility, host on Windows (IIS / Kestrel on Windows).</small></p>
+</body>
+</html>
