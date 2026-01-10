@@ -1,24 +1,32 @@
-# Build Stage
+# 1. Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy the entire repo and move into the WebApp folder
+# Copy the entire repository into the container
 COPY . .
-WORKDIR "/MyWebApp"
 
-# Restore and Publish
-RUN dotnet build
-RUN dotnet run
+# Move into the subfolder where the .csproj file lives
+WORKDIR "/src/MyWebApp"
 
-# Run Stage
+# Restore dependencies
+RUN dotnet restore
+
+# Build and publish the app to a folder called /app
+RUN dotnet publish -c Release -o /app
+
+# 2. Run Stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# Install libgdiplus for graphical output (required by BOOSE)
+# Install libgdiplus for the BOOSE graphics engine
 RUN apt-get update && apt-get install -y libgdiplus libc6-dev && rm -rf /var/lib/apt/lists/*
 
-# Copy built files from the build stage
+# Copy the compiled files from the build stage
 COPY --from=build /app .
 
-# Entry point - the DLL will be named after your project file
+# Expose the port ASP.NET uses by default in .NET 8+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+# Start the application
 ENTRYPOINT ["dotnet", "MyWebApp.dll"]
