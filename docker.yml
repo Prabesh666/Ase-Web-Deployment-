@@ -4,11 +4,11 @@ WORKDIR /src
 
 # Copy the entire repo and move into the WebApp folder
 COPY . .
-WORKDIR "/src/MyWebApp"
+WORKDIR "/MyWebApp"
 
 # Restore and Publish
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app
+RUN dotnet build
+RUN dotnet run
 
 # Run Stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
