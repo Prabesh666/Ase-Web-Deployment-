@@ -42,5 +42,5 @@ dotnet run
 ```
 
 
-Once the application starts, navigate to the URL provided in the terminal (usually `http://localhost:5000` or `https://localhost:5001`).
+Once the application starts, navigate to the URL provided in the terminal (usually `http://localhost:5000` or `https://localhost:5001`)
 
